@@ -13,3 +13,4 @@ The first thing is to install zenbot! The author has a simple tutorial on his pa
 
 after, download my bot, point the path to the zenbot folder zenbotpath="/home/x/zenbot" and, set the paramethers you want and you are good to go!
 
+![alt tag](https://cdn1.imggmi.com/uploads/2019/7/6/52a6e68a9c8d8a3ec7bd4a048382e0d7-full.png)
