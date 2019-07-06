@@ -22,4 +22,6 @@ like any other bash script: chmod +X bot.sh
 sudo ./bot.sh 
 why run as sudo ( unfortunately, sudo is a requirement for coinmarketcap apy. Also, the bot creates a ramdisk to put some files, required, in /mnt/lpmbot. These are text files with prices.
 
-why i created the script? i-ve played a lot with Zenbot. for some reason, you set the parameters, and its laggy, meaning that it waits till it makes the transaction with the parameters you give! 
+Why i created the script? I have played a lot with Zenbot. For some unknown reason, you set the parameters, and it is laggy, meaning that it waits until it makes the transaction with the parameters you give! 
+
+strategy: at the moment, the only strategy is : buy low, sale high! which mean you can put the x%+lowest session price to buy, and x%-higgest price to sale. Translated, that means that the script will buy after a price fall, when the coin reach the lowest price plus buy % and will sale when the coin will decline, meaning peak price minus sale percent! I wait your suggestions to implement future strategys!
