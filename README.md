@@ -11,7 +11,8 @@ How to install?
 
 The first thing is to install zenbot! The author has a simple tutorial on his page. I reccomend ubuntu or ubuntu server and Virtualbox!
 you need to put api and secret for binance in the file binance/binancebridge.py. at the moment, binance is the only one suported!
-after, download my bot, point the path to the zenbot folder zenbotpath="/home/x/zenbot" and, set the paramethers you want and you are good to go!
+after, download my bot, point the path to the zenbot folder zenbotpath="/home/x/zenbot" and, set the paramethers you want and you are good to go! 
+This script does not require any instalation, just download, extract, add your API (or not, in test mode you dont need them) and you are good to launch it!
 
 requirements :
 bc  python-requests-cache python-requests
