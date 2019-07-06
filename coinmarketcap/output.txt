@@ -1,0 +1,2 @@
+{u'cached': True, u'data': {u'1': {u'last_updated': 1527432872, u'name': u'Bitcoin', u'symbol': u'BTC', u'rank': 1, u'total_supply': 17058200.0, u'quotes': {u'USD': {u'market_cap': 125499565548.0, u'percent_change_7d': -12.54, u'price': 7357.14, u'percent_change_24h': -2.54, u'volume_24h': 4134740000.0, u'percent_change_1h': 0.5}}, u'max_supply': 21000000.0, u'circulating_supply': 17058200.0, u'website_slug': u'bitcoin', u'id': 1}}, u'metadata': {u'timestamp': 1527432854, u'num_cryptocurrencies': 1624, u'error': None}}
+do_work function took 9.261 ms

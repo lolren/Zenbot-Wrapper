@@ -96,7 +96,7 @@ zenbotpath="/home/lolren/zenbot"
 tradelog="/home/lolren/bot//logs/tradelog.txt"
 # default log tradelog path
 #######################################################################################END OF CONFIG FILES!!!!!!!!!!!#######################################################################################
-default_email=lor3n4you200@gmail.com
+default_email=x@gmail.com
 
 send_mail=no # this will send or not send a email on each transaction!
 #the trade bot sends an email from a gmail account
