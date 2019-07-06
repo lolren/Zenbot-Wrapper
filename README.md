@@ -10,7 +10,16 @@ of our coin, to know if the bot begin with a sale or a buy action! can make it o
 How to install?
 
 The first thing is to install zenbot! The author has a simple tutorial on his page. I reccomend ubuntu or ubuntu server and Virtualbox!
-
+you need to put api and secret for binance in the file binance/binancebridge.py. at the moment, binance is the only one suported!
 after, download my bot, point the path to the zenbot folder zenbotpath="/home/x/zenbot" and, set the paramethers you want and you are good to go!
 
-![alt tag](https://cdn1.imggmi.com/uploads/2019/7/6/52a6e68a9c8d8a3ec7bd4a048382e0d7-full.png)
+requirements :
+bc  python-requests-cache python-requests
+
+
+How to run?
+like any other bash script: chmod +X bot.sh
+sudo ./bot.sh 
+why run as sudo ( unfortunately, sudo is a requirement for coinmarketcap apy. Also, the bot creates a ramdisk to put some files, required, in /mnt/lpmbot. These are text files with prices.
+
+why i created the script? i-ve played a lot with Zenbot. for some reason, you set the parameters, and its laggy, meaning that it waits till it makes the transaction with the parameters you give! 
