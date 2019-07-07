@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+# TO RESOLVE THE FAST BUY SITUATION!!! AT THE MOMENT, THE BOT IS BUYING BASED ON NUMBERS ONLY!
 trade_type=simulate
 #can be simulate or live
 
@@ -29,9 +29,7 @@ strategy=buy_low_sell_high_strategy
 #getliveprice - function to get the live price
 
 #####################################################################################
-#timer function we require those timigs
- 
-#1m, 2m, 3m, 5m, 10m, 15m, 30m, 1h, 5h, 10h, 24h
+buy_price_smaller_than_sale_price=true
 
 #######################################################################################
 
@@ -42,20 +40,20 @@ coin=BTCUSDT
 #change here if you want a different coin
 #coin - the selected pair of coins
 ##############################################################################
-buypercent=0.3
+buypercent=0.2
 #buy percentage
 ##############################################################################
-sellpercent=0.3
+sellpercent=0.2
 #sell percentage
 #############################################################################
-failsafebuypercent=10
-failsafesellpercent=10 ######will have to delete it in the future
+failsafebuypercent=1
+failsafesellpercent=1 ######will have to delete it in the future
 #After 1 failsafe triggered, the default buy and sell values will change to this fallback values
 #############################################################################
 stoploss=true
 #if true, this will not sell bellow the last buy price, other options: "false" to disable it
 ##############################################################################################
-minimumprofitpercent=0.4
+minimumprofitpercent=0.2
 #this is the minimum profit the bot will sell for if more than 0. to disable. set this to 0
 ##############################################################################################
 failsafe=0
@@ -66,7 +64,7 @@ failsafe=0
 readingerrorpercent=2 # this is the maximum allowed percent between readings.ex. if a reading is smaller or bigger than a average reading! happened in the testing!!!
 
 ################################################################################################
-#change this if you want a different update time for binance price readings 
+#change this if you want a different update time for binance price readings. it does not have any effect in simulate mode! 
 binanceupdateseconds=3
 ######################################################################################################################################################################################################
 rdg=10
@@ -75,9 +73,9 @@ rdg=10
 #example : if the prices are 1,2,3,4,5,6,7,8,9,10 ( this is rdg number), spike bottom will remove 1 and 2, spiketop will remove 9 and 10 and the bot makes an average of this
 #ALSO IMPORTANT: THIS NUMBER MUST BE BIGGER THAN spikebottom + spiketop+1
 #numbers of spikes reading to cut from the top. this cannot be more than rdg 
-spiketop=3
+spiketop=4
 #numbers of spikes reading to cut from the bottom. this cannot be more than rdg  
-spikebottom=3
+spikebottom=4
 #######################################################################################################################################################################################################
 buysellretryseconds=240
 #this is the time that the bot is trying to retry a buy or sell in seconds
@@ -96,13 +94,14 @@ zenbotpath="/home/lolren/zenbot"
 tradelog="/home/lolren/bot//logs/tradelog.txt"
 # default log tradelog path
 #######################################################################################END OF CONFIG FILES!!!!!!!!!!!#######################################################################################
-default_email=x@gmail.com
+default_email=lor3n4you200@gmail.com
 
 send_mail=no # this will send or not send a email on each transaction!
 #the trade bot sends an email from a gmail account
 ####### if you want to set your own gmail account sender, change the value from :  /home/zenbot/.msmtprc and /home/zenbot/.msmtprc
 ### if you don`t care about it, just modify the above mail and use your email.
-start_price_as_last_buy_price=true
+start_price_as_last_buy_price=false
+#can be true or false- THIS WILL DISABLE PANIC FOR THE FIRST ACTION, IF THE COIN WILL GO DOWN, IT WON`T PROTECT THE MONEY!!!!!
 #########################################################################
 
 ##################################multicoin...not enabled currently####################################
@@ -126,7 +125,7 @@ lastbuypriceswitch=1 # this will set the bot with the first read price as the bu
 lastsellprice=N/A
 manualkeypressswitch=1
 firsruntimer=0 
-
+allow_buy=1
 runtimecounter=0 # this is the runtime counter that adds 1 at every minute of script run! ( for now, just when multicoin is enabled, but that will change in the future) 
 cut="#" # this ensures you don`t see all the unavailable multicoin options 
 
@@ -404,7 +403,7 @@ finalprice () {
 	 #marker2
 	                                   averageprice=`head -n -$spikebottom $sorted | tail -n +$((spiketop+1)) | awk '{ s += $1 } END { printf("%.7f\n", s/NR) }'`
 									    errorfix2=`echo "scale=3; 100 * ($liveprice - $averageprice) / $averageprice " | bc | sed -e 's/^-\./-0./' -e 's/^\./0./' | tr --delete -`
-                                                  if (( $(echo "$errorfix2 > $readingerrorpercent" | bc -l) )); then #this wont allow any panic sell if the difference between averageprice and liveprice is to big
+                                                  if (( $(echo "$errorfix2 > $readingerrorpercent" | bc -l) )); then #this wont allow any panic sell if the difference between averageprice and liveprice is to big. it is necesary to remove spikes
 												  averageprice=$liveprice
 												 
 												  fi
@@ -533,7 +532,7 @@ if [ "$sim_sale" = "1" ] ; then
 echo do the simulation calculations for a selling operation
 
 coin1afterfee=`echo "scale=10; $coin1mainfreeassets  -  ( $coin1mainfreeassets / 100 * $market_fee)" | bc | sed 's/^\./0./'`
-coin2mainfreeassets=`echo "scale=10; $coin1afterfee * $averageprice " | bc | sed 's/^\./0./'`
+coin2mainfreeassets=`echo "scale=10; $coin1afterfee * $liveprice " | bc | sed 's/^\./0./'`
 coin1mainfreeassets=0
 sim_sale=0	
 fi
@@ -544,7 +543,7 @@ fi
 if  [ "$sim_buy" = "1" ] ; then
 
 coin2afterfee=`echo "scale=10; $coin2mainfreeassets  -  ( $coin2mainfreeassets / 100 * $market_fee)" | bc | sed 's/^\./0./'`
-coin1mainfreeassets=`echo "scale=10; $coin2afterfee / $averageprice " | bc | sed 's/^\./0./'`
+coin1mainfreeassets=`echo "scale=10; $coin2afterfee / $liveprice " | bc | sed 's/^\./0./'`
 
 echo do the simulation calculations for a buying operation 
 
@@ -553,17 +552,6 @@ coin2mainfreeassets=0
 sim_buy=0																												
 																								
 fi
-
-
-
-
-
-
-
-																										
-
-
-
 
 fi
  getassetsvariable=0
@@ -752,18 +740,6 @@ if [ $? == 0 ] || [ "$trade_type" = "simulate"  ]; then ########## this happens 
 			   
 buycheck () {
 
-####################################################################################################################################################
-
-											   
-                                              
-                                               
-                                              
-											  
-####################################################################################################################################################
-
-
-
-
 
 if [ $buycheckswitch = "1"  ] ; then
                                               echo setting up time and date before buy
@@ -944,9 +920,6 @@ buy_low_sell_high_strategy ()
 {
 
 #this is the strategy which means ,buy low, sell high
-
-
-#this will be the implemented strategy
 #note : add a function when it buy`s after lowpercentage recovers a bit, maybe in a perioud of time
 #                                                                   important variables : 
 #                                                                                          $low - this is the lowest price so far
@@ -959,7 +932,6 @@ buy_low_sell_high_strategy ()
 #                                                                                          $getassetsvariable - if this is 1, it will retrieve assets from binance 
 #                                                                                          $lastbuyprice - the last price the bot bought
 #                                                                                          $lastsellprice - the last price the bot sold at
-#                                                                                          $allowsell - switch from the profit on  function (1 or 0)
 #																						   $allowsellminprofitswitch - switch from the minimum profit percent function (1 or 0)
 
                                                                                                        if (( $(echo "$lowpercentage >= $buypercent" | bc -l) )); then
@@ -969,7 +941,6 @@ buy_low_sell_high_strategy ()
 	                                                                if (( $(echo "$highpercentage >= $sellpercent" | bc -l) ));  then 
                                                                     sale 
 	                                                                fi                                                                   
-		                                                       
 
 }
 
@@ -977,11 +948,12 @@ buy_low_sell_high_strategy ()
 
 buy () {
 #this is the function that will buy. i`ve made it easy to simplify the strategy! 
-                                                                           if [ "$sold" = "1" ] ; then
+                                                                           if [ "$sold" = "1" ] && [ "$allow_buy" = "1" ] ; then
                                                                            echo we should buy here,calling zenbot
 																		   buyswitch=1
 																	       buycheckswitch=1
 																		   buycheck
+																		   allow_buy=0
 																		   fi
 }
 
@@ -1001,12 +973,49 @@ sale () {
 ############################################################################################END OF STRATEGYS##########################################################################################################
 profit () {
 
+                                                            
+                                                                        
+                                                        
+
+
+if [ "$buy_price_smaller_than_sale_price" = "true" ] ; then 
+                             
+                                           if (( $(echo "$lastsellprice > 0" | bc -l) )); 	then 	
+                                                      
+													   if (( $(echo "$lastsellprice > $averageprice" | bc -l) )); then 
+                                            allow_buy=1
+											else 
+											allow_buy=0
+											
+
+                                                      fi											      
+                                            
+                                            fi
+
+
+
+
+else 
+
+allow_buy=1
+
+fi 
+
 
 
 if [ "$lastbuypriceswitch"  = "1" ] && [ "$bought" = "1" ]  ; then 
-lastbuyprice=`awk 'NR==1 {print; exit}' $pricelist`   ### this sets the lastbuyprice as the first price read 
-echo the last buy price is $lastbuyprice and i am here 
-lastbuypriceswitch=0
+                                                                           if [ "$start_price_as_last_buy_price" = "true" ] ; then 
+																		   
+																		   
+                                                                lastbuyprice=`awk 'NR==1 {print; exit}' $pricelist`   ### this sets the lastbuyprice as the first price read 
+                                                               lastbuypriceswitch=0
+                                                                 else 
+																 lastbuyprice=0
+                                                               lastbuypriceswitch=0
+                                                                             fi 
+
+
+
  fi
 
 
@@ -1015,6 +1024,8 @@ lastbuypriceswitch=0
 #variables to control this function:
 #stoploss-can be true or false
 #minimumprofitpercent- can be a number in %. it will be the number between the buy price and the price the bot can sell at 
+
+
 
                                                                                                  if [ "$stoploss" = "true" ] && [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ] ;  then 
                                  #  if (( $(awk 'BEGIN {print ("'$averageprice'" > "'$lastbuyprice'")}') ));
@@ -1035,10 +1046,16 @@ lastbuypriceswitch=0
  
  
  #this allows the first trade to be sell, regarding stoploss option
- if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ] ; then
+ if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ]  ; then
  #echo i shoould not see this
- gainpercent=`echo "scale=3; 100 * ($averageprice - $lastbuyprice) / $lastbuyprice" | bc | sed -e 's/^-\./-0./' -e 's/^\./0./' `
+                             if  [ "$start_price_as_last_buy_price" = "true" ] || [ "$tradesnr" != "0" ] ; then 
 
+                             gainpercent=`echo "scale=3; 100 * ($averageprice - $lastbuyprice) / $lastbuyprice" | bc | sed -e 's/^-\./-0./' -e 's/^\./0./' `
+                               else 
+							   gainpercent=0
+							   fi
+							   # this may cause me a problem, need to look into it later! flag
+							   
  
  fi
  
@@ -1047,17 +1064,20 @@ lastbuypriceswitch=0
                                                                                     if [ "$minimumprofitpercent" != "0" ] && [ "$bought" = "1" ] &&  [ "$readingsnr" = "$rdg" ]  ; then 
 																				
                                               if (( $(echo "$averageprice >= $lastbuyprice" | bc -l) ));  
-                                         # if (( $(awk 'BEGIN {print ("'$averageprice'" >= "'$lastbuyprice'")}') )); 
+                                        
 										  then
                                           #echo selling price is bigger than buy price, i am at this condition
 										  if (( $(echo "$gainpercent >= $minimumprofitpercent" | bc -l) ));  then 
-           #if (( $(awk 'BEGIN {print ("'$gainpercent'" >= "'$minimumprofitpercent'")}') )); then 
-	
+           
 	       #echo minimumprofitpercent meets the requirement
 	       allowsellminprofitswitch=1
            else
-           allowsellminprofitswitch=0	
-	       fi 
+		         if [ "$start_price_as_last_buy_price" != "true" ] && [ "$tradesnr" = "0" ] ; then 
+           allowsellminprofitswitch=1
+		         else 
+	           allowsellminprofitswitch=0
+			     fi
+		   fi 
      				                        fi
 					                                                                 else
                                                                                      allowsellminprofitswitch=1
@@ -1067,7 +1087,7 @@ lastbuypriceswitch=0
 																					  
 #maximum gain percent
 
- if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ] ; then
+ if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ]  ; then
   if (( $(echo "$gainpercent > 0" | bc -l) )); 	then
  #echo i shoould not see this
  #highestgainpercent
@@ -1096,8 +1116,7 @@ lastbuypriceswitch=0
 																												 
 																										
 																												
-if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ]  && [ "$failsafe" != "0" ] ; then 
-
+if [ "$bought" = "1" ] && [ "$readingsnr" = "$rdg" ]  && [ "$failsafe" != "0" ]   && [ "$start_price_as_last_buy_price" = "true" ]  ; then 
 
 
 loosepercent=`echo "scale=3; 100 * ($averageprice - $lastbuyprice) / $lastbuyprice " | bc | sed -e 's/^-\./-0./' -e 's/^\./0./' | tr --delete -`
